@@ -14,13 +14,15 @@ p1score = 0
 p2score = 0
 
 # Create paddles and ball
-p1 = canvas.create_rectangle(40, 255, 60, 345, fill='white')
-p2 = canvas.create_rectangle(740, 255, 760, 345, fill='white')
+p1 = canvas.create_rectangle(40, 255, 60, 345, fill='blue')
+p2 = canvas.create_rectangle(740, 255, 760, 345, fill='red')
 ball = canvas.create_oval(400, 300, 420, 320, fill='white')
-score = canvas.create_text(380, 50, fill='red', font="Courier 24 normal", text=f"Player 1: {p1score}   Player 2: {p2score}")
+score = canvas.create_text(380, 50, fill='white', font="Courier 24 normal", text=f"Player 1: {p1score}   Player 2: {p2score}")
 
 # Ball movement speed
-x, y = 4, 4
+initial_x_speed = 4
+initial_y_speed = 4
+x, y = initial_x_speed, initial_y_speed
 
 # Paddle movement direction
 p1_move_up = False
@@ -80,20 +82,22 @@ try:
 
         # Check for scoring conditions
         if ball_coords[0] <= 0:  # Ball passed left side
+            x, y = initial_x_speed, initial_y_speed
             x = -x
             canvas.coords(ball, 400, 300, 420, 320)
             p2score += 1
             canvas.delete(score)
-            score = canvas.create_text(380, 50, fill='red', font="Courier 24 normal",
+            score = canvas.create_text(380, 50, fill='white', font="Courier 24 normal",
                                        text=f"Player 1: {p1score}   Player 2: {p2score}")
             os.system('say "score"') if os.name == 'posix' else None
 
         if ball_coords[2] >= 800:  # Ball passed right side
+            x, y = initial_x_speed, initial_y_speed
             x = -x
             canvas.coords(ball, 400, 300, 420, 320)
             p1score += 1
             canvas.delete(score)
-            score = canvas.create_text(380, 50, fill='red', font="Courier 24 normal",
+            score = canvas.create_text(380, 50, fill='white', font="Courier 24 normal",
                                        text=f"Player 1: {p1score}   Player 2: {p2score}")
             os.system('say "score"') if os.name == 'posix' else None
 
@@ -104,9 +108,14 @@ try:
         # Ball bouncing on paddles
         if (740 <= ball_coords[2] <= 760 and ball_coords[3] >= p2_coords[1] and ball_coords[1] <= p2_coords[3] and x > 0):
             x = -x
+            #this is where the ball increases speed on each hit of the AI    
+            x *= 1.3
+            y *= 1.3
+
         if (40 <= ball_coords[0] <= 60 and ball_coords[3] >= p1_coords[1] and ball_coords[1] <= p1_coords[3] and x < 0):
             x = -x
-
+            # this is where the AI paddle grows on each hit of the player
+            canvas.coords(p2, p2_coords[0], p2_coords[1] - 20, p2_coords[2], p2_coords[3] + 20)
         # Move AI paddle (Player 2)
         ai_move_p2()
 
